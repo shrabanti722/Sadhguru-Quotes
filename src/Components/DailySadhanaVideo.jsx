@@ -56,6 +56,7 @@ const DailySadhanaVideo = ({
       progressBar.style.flexBasis = "0%";
       return;
     }
+    if (progressBar)
     progressBar.style.flexBasis = `${percent}%`;
   };
 

@@ -21,9 +21,9 @@ const StoryCard = ({ dailyQuoteObj }) => {
   const [sadhanaConfirmed, setSadhanaConfirmed] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [dailySadhanaObj, setDailySadhanaObj] = useState(null);
-  const [quoteLoading, setQuoteLoading] = useState(false);
   const [clickedShareBtn, setClickedShareBtn] = useState(false);
   const [videoLoader, setVideoLoader] = useState(true);
+  const [isQuoteProgressing, setIsQuoteProgressing] = useState(true);
 
   const divRef = useRef(null);
 
@@ -98,6 +98,7 @@ const StoryCard = ({ dailyQuoteObj }) => {
       // progressBar.style.flexBasis = '0%';
       return;
     }
+    if (progressBar)
     progressBar.style.flexBasis = `${percent}%`;
   };
 
@@ -281,6 +282,18 @@ const StoryCard = ({ dailyQuoteObj }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (currPage === 0) {
+      setIsQuoteProgressing(true)
+      setTimeout(() => {
+        setIsQuoteProgressing(false);
+        setCurrPage(1);
+      }, 20000);  
+    } else {
+      setIsQuoteProgressing(false);
+    }
+  }, [currPage]);
+
   return (
     <>
       <div className="isDesktop" style={{ flexDirection: "column" }}>
@@ -321,10 +334,12 @@ const StoryCard = ({ dailyQuoteObj }) => {
         ) : null}
         <div>
           <div style={{ minHeight: "10px" }}></div>
-       {dailyQuoteObj?.currDate === dailyQuoteObj?.date ?   <div className="progressContainer">
+       {dailyQuoteObj?.currDate === dailyQuoteObj?.date ?  
+        <div className="progressContainer">
             <div className={getProgressClassName("progress-bar", 0)}>
               <div
-                className={getFilledProgressClassName("filled-progress", 0)}
+                className={`filled-progress ${isQuoteProgressing ? 'quoteFilled': 'filled'}`}
+                // className={getFilledProgressClassName("filled-progress", 0)}
               />
             </div>
             <div className={getProgressClassName("progress-bar", 1)}>
