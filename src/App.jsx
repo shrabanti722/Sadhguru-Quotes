@@ -138,29 +138,11 @@ const App = () => {
             id: "previous",
             date: calcDatesArr[0],
             story: prevDayStory,
-            component: (
-              <StoryCard
-                dailyQuoteObj={getComponentObj(
-                  prevDayStory,
-                  calcDatesArr[0],
-                  date,
-                )}
-              />
-            ),
           },
           {
             id: "current",
             date: calcDatesArr[1],
             story: fetchedCurrStory,
-            component: (
-              <StoryCard
-                dailyQuoteObj={getComponentObj(
-                  fetchedCurrStory,
-                  calcDatesArr[1],
-                  date,
-                )}
-              />
-            ),
           },
         ]);
         // setDailyQuoteObjArr([
