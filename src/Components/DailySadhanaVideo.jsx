@@ -14,7 +14,10 @@ const DailySadhanaVideo = ({
   videoLoader,
   setVideoLoader,
 }) => {
+  const [isPlaying, setIsPlaying] = useState(true);
+
   const getVideoUrl = (url) => {
+    // lcp --proxyUrl https://sgexclusive.sadhguru.org
     // lcp --proxyUrl https://sgapp-vod.sadhguru.org --port 8012
     // lcp --proxyUrl https://images-sgex-prod.sadhguru.org --port 8011
     if (!url) return;
@@ -56,8 +59,7 @@ const DailySadhanaVideo = ({
       progressBar.style.flexBasis = "0%";
       return;
     }
-    if (progressBar)
-    progressBar.style.flexBasis = `${percent}%`;
+    if (progressBar) progressBar.style.flexBasis = `${percent}%`;
   };
 
   window.onblur = () => {
@@ -65,8 +67,6 @@ const DailySadhanaVideo = ({
     if (!video) return;
     video.pause();
   };
-
-  const [isPlaying, setIsPlaying] = useState(true);
 
   const togglePlay = () => {
     const video = document.getElementById(`video${date}`);
@@ -97,40 +97,40 @@ const DailySadhanaVideo = ({
     <>
       <div style={{ minHeight: "20px" }}></div>
       <div className="content">
-        {videoLoader ? <div className="videoLoader" /> : null }
+        {videoLoader ? <div className="videoLoader" /> : null}
         <div
-            style={{
-              marginLeft: "-20px",
-              marginTop: "-20px",
-              width: "100%",
-            }}
-          >
-            <ShakaPlayer
-              id={`video${date}`}
-              autoPlay
-              // src="https://images-sgex-prod.sadhguru.org/static-exclusive/sadhguru_app/stories/28383/master.m3u8"
-              src={getVideoUrl(dailySadhanaObj?.media_url)}
-              className="videoPlayer"
-              muted={isMuted}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-            />
+          style={{
+            marginLeft: "-20px",
+            marginTop: "-20px",
+            width: "100%",
+          }}
+        >
+          <ShakaPlayer
+            id={`video${date}`}
+            autoPlay
+            // src="https://images-sgex-prod.sadhguru.org/static-exclusive/sadhguru_app/stories/28383/master.m3u8"
+            src={getVideoUrl(dailySadhanaObj?.media_url)}
+            className="videoPlayer"
+            muted={isMuted}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+          />
 
-            <div className="playPauseBtn" onClick={togglePlay}>
-              <div style={{ cursor: "pointer" }}>
-                <div style={{ minHeight: "80px" }}>
-                  <img
-                    src={
-                      isPlaying
-                        ? "https://webapp.sadhguru.org/assets/pauseImage-cac442d6.svg"
-                        : "https://webapp.sadhguru.org/assets/playImage-32be498e.svg"
-                    }
-                    alt=""
-                  />
-                </div>
+          <div className="playPauseBtn" onClick={togglePlay}>
+            <div style={{ cursor: "pointer" }}>
+              <div style={{ minHeight: "80px" }}>
+                <img
+                  src={
+                    isPlaying
+                      ? "https://webapp.sadhguru.org/assets/pauseImage-cac442d6.svg"
+                      : "https://webapp.sadhguru.org/assets/playImage-32be498e.svg"
+                  }
+                  alt=""
+                />
               </div>
             </div>
           </div>
+        </div>
       </div>
     </>
   );

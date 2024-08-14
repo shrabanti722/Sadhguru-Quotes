@@ -638,8 +638,8 @@ const App = () => {
                 >
                   <StoryCard
                     dailyQuoteObj={getComponentObj(
-                      quoteArr[1].story,
-                      quoteArr[1].date,
+                      quoteArr[1]?.story,
+                      quoteArr[1]?.date,
                       currDate,
                     )}
                   />
@@ -674,8 +674,8 @@ const App = () => {
                 >
                   <StoryCard
                     dailyQuoteObj={getComponentObj(
-                      quoteArr[2].story,
-                      quoteArr[2].date,
+                      quoteArr[2]?.story,
+                      quoteArr[2]?.date,
                       currDate,
                     )}
                   />

@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import axios from "axios";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import IosShareIcon from "@mui/icons-material/IosShare";
@@ -24,8 +23,18 @@ const StoryCard = ({ dailyQuoteObj }) => {
   const [clickedShareBtn, setClickedShareBtn] = useState(false);
   const [videoLoader, setVideoLoader] = useState(true);
   const [isQuoteProgressing, setIsQuoteProgressing] = useState(true);
+  const [progressPaused, setProgressPaused] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(19000);
+  const timeoutRef = useRef(null);
+  const intervalRef = useRef(null);
 
   const divRef = useRef(null);
+
+  const dateString = useMemo(
+    () => window.location.pathname.split("/").at(-1),
+    [],
+  );
+  const progressBar = document.getElementById(`slider${dailyQuoteObj.date}`);
 
   const _handleClick = (e) => {
     if (dailyQuoteObj?.isDesktop) return;
@@ -48,47 +57,6 @@ const StoryCard = ({ dailyQuoteObj }) => {
     }
   };
 
-  const dateString = useMemo(
-    () => window.location.pathname.split("/").at(-1),
-    [],
-  );
-  const progressBar = document.getElementById(`slider${dailyQuoteObj.date}`);
-
-  const componentsArr = useMemo(
-    () => [
-      <SadhguruQuotes dailyQuoteObj={dailyQuoteObj} />,
-      <DailySadhanaVideo
-        setCurrPage={setCurrPage}
-        currPage={currPage}
-        isMuted={isMuted}
-        dailySadhanaObj={dailySadhanaObj}
-        setDailySadhanaObj={setDailySadhanaObj}
-        date={dailyQuoteObj?.date}
-        key={dailyQuoteObj?.date}
-        dailyQuoteObj={dailyQuoteObj}
-        videoLoader={videoLoader}
-        setVideoLoader={setVideoLoader}
-      />,
-      <DailySadhana
-        sadhanaConfirmed={sadhanaConfirmed}
-        setSadhanaConfirmed={setSadhanaConfirmed}
-        dailySadhanaObj={dailySadhanaObj}
-      />,
-      <DownloadApp />,
-    ],
-    [
-      sadhanaConfirmed,
-      currPage,
-      isMuted,
-      dailyQuoteObj,
-      dailyQuoteObj?.date,
-      dailySadhanaObj,
-      dateString,
-      dailyQuoteObj?.transition,
-      videoLoader,
-    ],
-  );
-
   const handleProgress = () => {
     const video = document.getElementById(`video${dailyQuoteObj?.date}`);
     if (!video) return;
@@ -98,8 +66,7 @@ const StoryCard = ({ dailyQuoteObj }) => {
       // progressBar.style.flexBasis = '0%';
       return;
     }
-    if (progressBar)
-    progressBar.style.flexBasis = `${percent}%`;
+    if (progressBar) progressBar.style.flexBasis = `${percent}%`;
   };
 
   const handleVideoProgress = (curr) => {
@@ -120,21 +87,6 @@ const StoryCard = ({ dailyQuoteObj }) => {
     else setCurrPage(0);
     if (currPage === 1) progressBar.style.flexBasis = "0%";
   };
-
-  const getPage = useMemo(
-    () => componentsArr[currPage],
-    [
-      sadhanaConfirmed,
-      currPage,
-      isMuted,
-      dailyQuoteObj,
-      dailyQuoteObj?.date,
-      dailySadhanaObj,
-      dateString,
-      dailyQuoteObj?.transition,
-      videoLoader,
-    ],
-  );
 
   const getProgressClassName = useCallback(
     (className, page) => {
@@ -282,17 +234,157 @@ const StoryCard = ({ dailyQuoteObj }) => {
     }
   }, []);
 
+  const resetAnimation = () => {
+    const el = document.getElementsByClassName("quoteFilled")[0];
+    if (!el) return;
+    el.style.animation = "none";
+    el.offsetHeight; /* trigger reflow */
+    el.style.animation = null;
+  };
+
+  // useEffect(() => {
+  //   if (dailyQuoteObj?.date === dailyQuoteObj?.currDate && currPage === 0) {
+  //     resetAnimation();
+  //     setIsQuoteProgressing(true)
+  //     setTimeout(() => {
+  //       setIsQuoteProgressing(false);
+  //       setCurrPage(1);
+  //     }, 20000);
+  //   } else {
+  //     setIsQuoteProgressing(false);
+  //   }
+  // }, [currPage, dailyQuoteObj?.date]);
+
+  const quoteProgressClassName = useMemo(() => {
+    if (isQuoteProgressing) {
+      if (progressPaused) return "quoteFilled paused";
+      return "quoteFilled";
+    }
+    return "filled";
+  }, [isQuoteProgressing, progressPaused]);
+
+  const resetTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
   useEffect(() => {
-    if (currPage === 0) {
-      setIsQuoteProgressing(true)
-      setTimeout(() => {
+    if (progressPaused) return;
+    resetTimeout();
+    if (dailyQuoteObj?.date === dailyQuoteObj?.currDate && currPage === 0) {
+      intervalRef.current = setInterval(() => {
+        setRemainingTime((prev) => {
+          return prev - 1000;
+        });
+    }, 1000);
+
+      timeoutRef.current = setTimeout(() => {
         setIsQuoteProgressing(false);
         setCurrPage(1);
-      }, 20000);  
+      }, remainingTime);
+
     } else {
       setIsQuoteProgressing(false);
     }
-  }, [currPage]);
+
+    return () => {
+      resetTimeout();
+    };
+  }, [progressPaused]);
+
+
+  useEffect(() => {
+    setRemainingTime(19000);
+    resetTimeout();
+    resetAnimation();
+    setIsQuoteProgressing(true);
+
+    if (dailyQuoteObj?.date === dailyQuoteObj?.currDate && currPage === 0) {
+      intervalRef.current = setInterval(() => {
+        setRemainingTime((prev) => {
+          return prev - 1000;
+        });
+    }, 1000);
+
+      timeoutRef.current = setTimeout(() => {
+        setIsQuoteProgressing(false);
+        setCurrPage(1);
+      }, remainingTime);
+
+    } else {
+      setIsQuoteProgressing(false);
+    }
+
+    return () => {
+      resetTimeout();
+    };
+  }, [currPage, dailyQuoteObj?.date]);
+
+  const handleProgressToggle = () => {
+    resetTimeout();
+    setProgressPaused((prev) => !prev);
+  };
+
+  const componentsArr = useMemo(
+    () => [
+      <SadhguruQuotes
+        dailyQuoteObj={dailyQuoteObj}
+        handleProgressToggle={handleProgressToggle}
+      />,
+      <DailySadhanaVideo
+        setCurrPage={setCurrPage}
+        currPage={currPage}
+        isMuted={isMuted}
+        dailySadhanaObj={dailySadhanaObj}
+        setDailySadhanaObj={setDailySadhanaObj}
+        date={dailyQuoteObj?.date}
+        key={dailyQuoteObj?.date}
+        dailyQuoteObj={dailyQuoteObj}
+        videoLoader={videoLoader}
+        setVideoLoader={setVideoLoader}
+      />,
+      <DailySadhana
+        sadhanaConfirmed={sadhanaConfirmed}
+        setSadhanaConfirmed={setSadhanaConfirmed}
+        dailySadhanaObj={dailySadhanaObj}
+      />,
+      <DownloadApp />,
+    ],
+    [
+      sadhanaConfirmed,
+      currPage,
+      isMuted,
+      dailyQuoteObj,
+      dailyQuoteObj?.date,
+      dailySadhanaObj,
+      dateString,
+      dailyQuoteObj?.transition,
+      dailySadhanaObj?.media_url,
+      videoLoader,
+      // progressPaused
+    ],
+  );
+
+  const getPage = useMemo(
+    () => componentsArr[currPage],
+    [
+      sadhanaConfirmed,
+      currPage,
+      isMuted,
+      dailyQuoteObj,
+      dailyQuoteObj?.date,
+      dailySadhanaObj,
+      dateString,
+      dailyQuoteObj?.transition,
+      dailySadhanaObj?.media_url,
+      videoLoader,
+      // progressPaused,
+    ],
+  );
 
   return (
     <>
@@ -334,31 +426,32 @@ const StoryCard = ({ dailyQuoteObj }) => {
         ) : null}
         <div>
           <div style={{ minHeight: "10px" }}></div>
-       {dailyQuoteObj?.currDate === dailyQuoteObj?.date ?  
-        <div className="progressContainer">
-            <div className={getProgressClassName("progress-bar", 0)}>
-              <div
-                className={`filled-progress ${isQuoteProgressing ? 'quoteFilled': 'filled'}`}
-                // className={getFilledProgressClassName("filled-progress", 0)}
-              />
+          {dailyQuoteObj?.currDate === dailyQuoteObj?.date ? (
+            <div className="progressContainer">
+              <div className={getProgressClassName("progress-bar", 0)}>
+                <div
+                  className={`filled-progress ${quoteProgressClassName}`}
+                  // className={getFilledProgressClassName("filled-progress", 0)}
+                />
+              </div>
+              <div className={getProgressClassName("progress-bar", 1)}>
+                <div
+                  className="filled-progress slider"
+                  id={`slider${dailyQuoteObj?.date}`}
+                />
+              </div>
+              <div className={getProgressClassName("progress-bar", 2)}>
+                <div
+                  className={getFilledProgressClassName("filled-progress", 2)}
+                />
+              </div>
+              <div className={getProgressClassName("progress-bar", 3)}>
+                <div
+                  className={getFilledProgressClassName("filled-progress", 3)}
+                />
+              </div>
             </div>
-            <div className={getProgressClassName("progress-bar", 1)}>
-              <div
-                className="filled-progress slider"
-                id={`slider${dailyQuoteObj?.date}`}
-              />
-            </div>
-            <div className={getProgressClassName("progress-bar", 2)}>
-              <div
-                className={getFilledProgressClassName("filled-progress", 2)}
-              />
-            </div>
-            <div className={getProgressClassName("progress-bar", 3)}>
-              <div
-                className={getFilledProgressClassName("filled-progress", 3)}
-              />
-            </div>
-          </div> : null}
+          ) : null}
           <div style={{ minHeight: "10px" }}></div>
         </div>
         <div className="contentContainer">

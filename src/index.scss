@@ -587,6 +587,13 @@ body {
                     animation: progress 20s;
                   }
 
+                  &.paused{
+                    -webkit-animation-play-state:paused;
+                    -moz-animation-play-state:paused;
+                    -o-animation-play-state:paused; 
+                    animation-play-state:paused;
+                }
+
                   &.slider {
                     flex: 0;
                     flex-basis: 0%;
