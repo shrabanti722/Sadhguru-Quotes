@@ -583,6 +583,17 @@ body {
                     width: 150px;
                   }
 
+                  &.quoteFilled {
+                    animation: progress 20s;
+                  }
+
+                  &.paused{
+                    -webkit-animation-play-state:paused;
+                    -moz-animation-play-state:paused;
+                    -o-animation-play-state:paused; 
+                    animation-play-state:paused;
+                }
+
                   &.slider {
                     flex: 0;
                     flex-basis: 0%;
@@ -944,40 +955,14 @@ body {
           }
         }
 
-        $green: #4cd964;
-        $turquoise: #5ac8fa;
-        $blue: #007aff;
-        $light-blue: #7DC8E8;
-        $purple: #5856d6;
-        $red: #ff2d55;
-
-        @keyframes progressBarAnimation {
-          0% {
-            background-image:
-              linear-gradient(to right, $green, $turquoise, $blue, $light-blue, $purple, $red);
+        @keyframes progress {
+          from {
+              width: 0;
           }
-
-          20% {
-            background-image:
-              linear-gradient(to right, $turquoise, $blue, $light-blue, $purple, $red, $green);
+          to {
+            width: 100%;
           }
-
-          40% {
-            background-image:
-              linear-gradient(to right, $blue, $light-blue, $purple, $red, $green, $turquoise);
-          }
-
-          60% {
-            background-image:
-              linear-gradient(to right, $light-blue, $purple, $red, $green, $turquoise, $blue);
-          }
-
-          100% {
-            background-image:
-              linear-gradient(to right, $purple, $red, $green, $turquoise, $blue, $light-blue);
-          }
-        }
-
+      }
 
         // #currDay:checked ~ .cards #nextDayLabel,
         // #prevDay:checked ~ .cards #currDayLabel,

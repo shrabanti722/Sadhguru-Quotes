@@ -1,9 +1,9 @@
 import React from "react";
 
-const SadhguruQuotes = ({ dailyQuoteObj }) => {
+const SadhguruQuotes = ({ dailyQuoteObj, handleProgressToggle }) => {
   return (
     <>
-      <div className="content">
+      <div className="content" onClick={handleProgressToggle}>
         <div>
           <div
             style={{
@@ -29,9 +29,7 @@ const SadhguruQuotes = ({ dailyQuoteObj }) => {
             </div>
             <div style={{ marginBottom: "-20px" }}></div>
           </div>
-          <div
-            className="quoteContainer"
-          >
+          <div className="quoteContainer">
             <div style={{ minHeight: "20px" }}></div>
             <div
               style={{
