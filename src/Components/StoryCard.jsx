@@ -298,10 +298,11 @@ const StoryCard = ({ dailyQuoteObj }) => {
 
 
   useEffect(() => {
+    setIsQuoteProgressing(true);
+    setProgressPaused(false);
     setRemainingTime(19000);
     resetTimeout();
     resetAnimation();
-    setIsQuoteProgressing(true);
 
     if (dailyQuoteObj?.date === dailyQuoteObj?.currDate && currPage === 0) {
       intervalRef.current = setInterval(() => {

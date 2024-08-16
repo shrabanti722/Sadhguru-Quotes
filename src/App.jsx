@@ -3,9 +3,7 @@ import axios from "axios";
 import moment from "moment";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import "./App.css";
 import "./index.scss";
-import "./carousal.scss";
 import StoryCard from "./Components/StoryCard";
 import dayjs from "dayjs";
 import useWindowDimensions from "./common";
@@ -297,6 +295,7 @@ const App = () => {
             // ),
           },
         ]);
+        setCurrDate(next.date);
         // setDailyQuoteObjArr(calcArr);
       } else {
         // const nextStoryObj = await fetchQuoteHandler(nextDay);
@@ -662,7 +661,7 @@ const App = () => {
                     )}
                   />
                 </label>
-                <label
+                {quoteArr?.length > 2 ? <label
                   class={`card ${quoteArr[2]?.id}`}
                   id={quoteArr[2]?.id}
                   for={`${quoteArr[2]?.id}Input`}
@@ -679,7 +678,7 @@ const App = () => {
                       currDate,
                     )}
                   />
-                </label>
+                </label>: null}
               </div>
             </div>
           </div>
